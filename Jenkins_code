@@ -2,71 +2,106 @@ pipeline {
     agent any
 
     stages {
-            stage('Build') {
-                steps {
-                    echo 'Building the code using a build automation tool: Gradle.'
-                }
+        stage('Build') {
+            steps {
+                echo 'Building the code using a build automation tool: Gradle.'
             }
-            stage('Unit and Integration Tests') {
-                steps {
-                    echo 'Running unit tests to ensure the code functions as expected using NUnit.'
-                    echo 'Running integration tests to ensure the different components of the application work together as expected using xUnit.'
-                }
-                post {
-                    always {
-                        script {
-                            def logContent = currentBuild.rawBuild.getLog(100).join('\n')
-                            writeFile file: 'unit-integration-tests.log', text: logContent
-                        }
-                        archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
-                        emailext to: 'deakin224345722@gmail.com',
-                                 subject: "Unit and Integration Test Log",
-                                 body: "Unit and Integration Tests Complete! Logs attached :)",
-                                 attachmentsPattern: 'unit-integration-tests.log'
+        }
+        stage('Unit and Integration Tests') {
+            steps {
+                echo 'Running unit tests to ensure the code functions as expected using NUnit.'
+                echo 'Running integration tests to ensure the different components of the application work together as expected using xUnit.'
+            }
+            post {
+                success {
+                    script {
+                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                        writeFile file: 'unit-integration-tests.log', text: logContent
                     }
+                    archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
+                    emailext to: 'deakin224345722@gmail.com',
+                             subject: "SUCCESS: Unit and Integration Test Log",
+                             body: "Unit and Integration Tests were successful! Logs attached :)",
+                             attachmentsPattern: 'unit-integration-tests.log'
                 }
-            }
-            stage('Code Analysis') {
-                steps {
-                    echo 'Integrating a code analysis tool to analyze the code and ensuring it meets industry standards.'
-                    echo 'Using Checkstyle is a great idea!'
-                }
-            }
-            stage('Security Scan') {
-                steps {
-                    echo 'Performing a security scan on the code using a tool to identify any vulnerabilities.'
-                    echo 'Let\'s use Snyk!'
-                }
-                post {
-                    always {
-                        script {
-                            def logContent = currentBuild.rawBuild.getLog(100).join('\n')
-                            writeFile file: 'security-scan.log', text: logContent
-                        }
-                        archiveArtifacts artifacts: 'security-scan.log', onlyIfSuccessful: false
-                        emailext to: 'deakin224345722@gmail.com',
-                                 subject: "Security Scan Test Log",
-                                 body: "Security Scan Tests Complete! Logs attached :)",
-                                 attachmentsPattern: 'security-scan.log'
+                failure {
+                    script {
+                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                        writeFile file: 'unit-integration-tests.log', text: logContent
                     }
+                    archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
+                    emailext to: 'deakin224345722@gmail.com',
+                             subject: "FAILURE: Unit and Integration Test Log",
+                             body: "Unit and Integration Tests failed. Logs attached :(",
+                             attachmentsPattern: 'unit-integration-tests.log'
+                }
+                always {
+                    script {
+                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                        writeFile file: 'unit-integration-tests.log', text: logContent
+                    }
+                    archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
                 }
             }
-            stage('Deploy to Staging') {
-                steps {
-                    echo 'Deploying the application to a staging server.'
-                    echo 'Using Google Cloud Compute Engine instance.'
+        }
+        stage('Code Analysis') {
+            steps {
+                echo 'Integrating a code analysis tool to analyze the code and ensuring it meets industry standards.'
+                echo 'Using Checkstyle is a great idea!'
+            }
+        }
+        stage('Security Scan') {
+            steps {
+                echo 'Performing a security scan on the code using a tool to identify any vulnerabilities.'
+                echo 'lets use Snyk!'
+            }
+            post {
+                success {
+                    script {
+                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                        writeFile file: 'security-scan-results.log', text: logContent
+                    }
+                    archiveArtifacts artifacts: 'security-scan-results.log', onlyIfSuccessful: false
+                    emailext to: 'deakin224345722@gmail.com',
+                             subject: "SUCCESS: Security Scan Test Log",
+                             body: "Security Scan Tests were successful! Logs attached :)",
+                             attachmentsPattern: 'security-scan-results.log'
+                }
+                failure {
+                    script {
+                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                        writeFile file: 'security-scan-results.log', text: logContent
+                    }
+                    archiveArtifacts artifacts: 'security-scan-results.log', onlyIfSuccessful: false
+                    emailext to: 'deakin224345722@gmail.com',
+                             subject: "FAILURE: Security Scan Test Log",
+                             body: "Security Scan Tests failed. Logs attached :(",
+                             attachmentsPattern: 'security-scan-results.log'
+                }
+                always {
+                    script {
+                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                        writeFile file: 'security-scan-results.log', text: logContent
+                    }
+                    archiveArtifacts artifacts: 'security-scan-results.log', onlyIfSuccessful: false
                 }
             }
-            stage('Integration Tests on Staging') {
-                steps {
-                    echo 'Running integration tests on the staging environment to ensure the application functions as expected in a production-like environment.'
-                }
+        }
+        stage('Deploy to Staging') {
+            steps {
+                echo 'Deploying the application to a staging server.'
+                echo 'Using Google Cloud Compute Engine instance.'
             }
-            stage('Deploy to Production') {
-                steps {
-                    echo 'Deploying the application to a production server.'
-                    echo 'Once again let\'s use Google Cloud Compute Engine instance!'
-                }
+        }
+        stage('Integration Tests on Staging') {
+            steps {
+                echo 'Running integration tests on the staging environment to ensure the application functions as expected in a production-like environment.'
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                echo 'Deploying the application to a production server.'
+                echo 'Once again lets use Google Cloud Compute Engine instance!'
             }
         }
     }
