@@ -41,6 +41,10 @@ pipeline {
                         writeFile file: 'unit-integration-tests.log', text: logContent
                     }
                     archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
+                    emailext to: 'deakin224345722@gmail.com',
+                             subject: "${currentBuild.result}: Unit and Integration Test Log",
+                             body: "Unit and Integration Tests are complete! Logs attached :)",
+                             attachmentsPattern: 'unit-integration-tests.log'
                 }
             }
         }
@@ -84,6 +88,10 @@ pipeline {
                         writeFile file: 'security-scan-results.log', text: logContent
                     }
                     archiveArtifacts artifacts: 'security-scan-results.log', onlyIfSuccessful: false
+                    emailext to: 'deakin224345722@gmail.com',
+                             subject: "${currentBuild.result}: Security Scan Test Log",
+                             body: "Security Scan Tests are complete! Logs attached :)",
+                             attachmentsPattern: 'security-scan-results.log'
                 }
             }
         }
