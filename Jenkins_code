@@ -19,7 +19,7 @@ pipeline {
                         writeFile file: 'unit-integration-tests.log', text: logContent
                     }
                     archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
-                    emailext to: 's224345722@deakin.edu.au',
+                    emailext to: 'deakin224345722@gmail.com',
                              subject: "Unit and Integration Test Log",
                              body: "Unit and Integration Tests Complete! Logs attached :)",
                              attachmentsPattern: 'unit-integration-tests.log'
@@ -44,7 +44,7 @@ pipeline {
                         writeFile file: 'security-scan.log', text: logContent
                     }
                     archiveArtifacts artifacts: 'security-scan.log', onlyIfSuccessful: false
-                    emailext to: 's224345722@deakin.edu.au',
+                    emailext to: 'deakin224345722@gmail.com',
                              subject: "Security Scan Test Log",
                              body: "Security Scan Tests Complete! Logs attached :)",
                              attachmentsPattern: 'security-scan.log'
