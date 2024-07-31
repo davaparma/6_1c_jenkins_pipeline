@@ -2,87 +2,72 @@ pipeline {
     agent any
 
     stages {
-        stage('Build') {
-            steps {
-                echo 'Building the code using a build automation tool: Gradle.'
-            }
-        }
-        stage('Unit and Integration Tests') {
-            steps {
-                echo 'Running unit tests to ensure the code functions as expected using NUnit.'
-                echo 'Running integration tests to ensure the different components of the application work together as expected using xUnit.'
-            }
-            post {
-                always {
-                    script {
-                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
-                        writeFile file: 'unit-integration-tests.log', text: logContent
-                    }
-                    archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
-                    emailext to: 'deakin224345722@gmail.com',
-                             subject: "Unit and Integration Test Log",
-                             body: "Unit and Integration Tests Complete! Logs attached :)",
-                             attachmentsPattern: 'unit-integration-tests.log'
+            stage('Build') {
+                steps {
+                    echo 'Building the code using a build automation tool: Gradle.'
                 }
             }
-        }
-        stage('Code Analysis') {
-            steps {
-                echo 'Integrating a code analysis tool to analyze the code and ensuring it meets industry standards.'
-                echo 'Using Checkstyle is a great idea!'
-            }
-        }
-        stage('Security Scan') {
-            steps {
-                echo 'Performing a security scan on the code using a tool to identify any vulnerabilities.'
-                echo 'Let\'s use Snyk!'
-            }
-            post {
-                always {
-                    script {
-                        def logContent = currentBuild.rawBuild.getLog(100).join('\n')
-                        writeFile file: 'security-scan.log', text: logContent
+            stage('Unit and Integration Tests') {
+                steps {
+                    echo 'Running unit tests to ensure the code functions as expected using NUnit.'
+                    echo 'Running integration tests to ensure the different components of the application work together as expected using xUnit.'
+                }
+                post {
+                    always {
+                        script {
+                            def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                            writeFile file: 'unit-integration-tests.log', text: logContent
+                        }
+                        archiveArtifacts artifacts: 'unit-integration-tests.log', onlyIfSuccessful: false
+                        emailext to: 'deakin224345722@gmail.com',
+                                 subject: "Unit and Integration Test Log",
+                                 body: "Unit and Integration Tests Complete! Logs attached :)",
+                                 attachmentsPattern: 'unit-integration-tests.log'
                     }
-                    archiveArtifacts artifacts: 'security-scan.log', onlyIfSuccessful: false
-                    emailext to: 'deakin224345722@gmail.com',
-                             subject: "Security Scan Test Log",
-                             body: "Security Scan Tests Complete! Logs attached :)",
-                             attachmentsPattern: 'security-scan.log'
                 }
             }
-        }
-        stage('Deploy to Staging') {
-            steps {
-                echo 'Deploying the application to a staging server.'
-                echo 'Using Google Cloud Compute Engine instance.'
+            stage('Code Analysis') {
+                steps {
+                    echo 'Integrating a code analysis tool to analyze the code and ensuring it meets industry standards.'
+                    echo 'Using Checkstyle is a great idea!'
+                }
             }
-        }
-        stage('Integration Tests on Staging') {
-            steps {
-                echo 'Running integration tests on the staging environment to ensure the application functions as expected in a production-like environment.'
+            stage('Security Scan') {
+                steps {
+                    echo 'Performing a security scan on the code using a tool to identify any vulnerabilities.'
+                    echo 'Let\'s use Snyk!'
+                }
+                post {
+                    always {
+                        script {
+                            def logContent = currentBuild.rawBuild.getLog(100).join('\n')
+                            writeFile file: 'security-scan.log', text: logContent
+                        }
+                        archiveArtifacts artifacts: 'security-scan.log', onlyIfSuccessful: false
+                        emailext to: 'deakin224345722@gmail.com',
+                                 subject: "Security Scan Test Log",
+                                 body: "Security Scan Tests Complete! Logs attached :)",
+                                 attachmentsPattern: 'security-scan.log'
+                    }
+                }
             }
-        }
-        stage('Deploy to Production') {
-            steps {
-                echo 'Deploying the application to a production server.'
-                echo 'Once again let\'s use Google Cloud Compute Engine instance!'
+            stage('Deploy to Staging') {
+                steps {
+                    echo 'Deploying the application to a staging server.'
+                    echo 'Using Google Cloud Compute Engine instance.'
+                }
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline execution completed.'
-        }
-        success {
-            mail to: 'developer@example.com',
-                subject: "Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "The build was successful.\n\nJob: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nDetails: ${env.BUILD_URL}"
-        }
-        failure {
-            mail to: 'developer@example.com',
-                subject: "Build Failure: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "The build has failed.\n\nJob: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nDetails: ${env.BUILD_URL}"
+            stage('Integration Tests on Staging') {
+                steps {
+                    echo 'Running integration tests on the staging environment to ensure the application functions as expected in a production-like environment.'
+                }
+            }
+            stage('Deploy to Production') {
+                steps {
+                    echo 'Deploying the application to a production server.'
+                    echo 'Once again let\'s use Google Cloud Compute Engine instance!'
+                }
+            }
         }
     }
 }
